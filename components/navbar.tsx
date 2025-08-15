@@ -95,17 +95,18 @@ const Header = () => {
                   userPreviewMainIdentifier: "font-semibold",
                 },
               }}
-              afterSignOutUrl="/"
+              afterSignOutUrl="/sign-in"
             />
 
              </SignedIn>
              
              {!SignedIn&&(
+              <Link href={'/sign-in'}>
             <Button className='gap-5 h-10 w-22 text-white font-medium transition-all duration-300 hover:text-cyan-400 cursor-pointer'>
 
               <span className="hidden md:flex">SignUp</span>
             </Button>
-            
+            </Link>
 )}
 
 
