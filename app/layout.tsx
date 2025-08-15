@@ -32,16 +32,17 @@ export default function RootLayout({
 }>) {
   return (
     <>
-    <Navbar/>
+    
      <ClerkProvider appearance={{
       baseTheme:shadesOfPurple
     }}>
       <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <header className="flex justify-end items-center p-4 gap-4 h-16">
           
-          </header>
+          <Navbar/>
+          <main>
           {children}
+          </main>
         </body>
       </html>
     </ClerkProvider>

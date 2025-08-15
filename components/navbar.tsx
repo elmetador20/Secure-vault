@@ -7,11 +7,12 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import { Button } from './ui/button';
 import {
-  ClerkProvider,
   SignInButton,
   SignUpButton,
   UserButton,
+  SignedIn, SignedOut
 } from '@clerk/nextjs'
+
 
 import { LayoutDashboard } from 'lucide-react';
 const Header = () => {
@@ -63,33 +64,56 @@ const Header = () => {
           </div>
         )
         }
-      
+
         <div className='flex itmes-centre gap-3 ml-10 md:ml-20'>
-        
-            
+          <SignedIn>
+
             <Link href="/dashboard">
-              <Button  className='gap-5 h-10 w-22 text-white font-medium transition-all duration-300 hover:text-cyan-400 cursor-pointer' >
-                
+              <Button className='gap-5 h-10 w-22 text-white font-medium transition-all duration-300 hover:text-cyan-400 cursor-pointer' >
+
                 <span className="hidden md:flex">Dashboard</span>
-              </Button></Link>
-               <Link href="/sign-in">
-              <Button  className='gap-5 h-10 w-22 text-white font-medium transition-all duration-300 hover:text-cyan-400 cursor-pointer' >
-                
-                <span className="hidden md:flex">SignIn</span>
               </Button>
-              </Link>
-               <Link href="/sign-up">
-              <Button  className='gap-5 h-10 w-22 text-white font-medium transition-all duration-300 hover:text-cyan-400 cursor-pointer'>
-                
-                <span className="hidden md:flex">SignUp</span>
-              </Button>
-
             </Link>
-           
+          </SignedIn>
+          <SignedOut>
+            <SignInButton>
 
+              <Button className='gap-5 h-10 w-22 text-white font-medium transition-all duration-300 hover:text-cyan-400 cursor-pointer' >
+
+                SignIn
+              </Button>
+            </SignInButton>
+
+          </SignedOut>
+
+          <SignedIn>
+ <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "w-10 h-10",
+                  userButtonPopoverCard: "shadow-xl",
+                  userPreviewMainIdentifier: "font-semibold",
+                },
+              }}
+              afterSignOutUrl="/"
+            />
+
+             </SignedIn>
+             
+             {!SignedIn&&(
+            <Button className='gap-5 h-10 w-22 text-white font-medium transition-all duration-300 hover:text-cyan-400 cursor-pointer'>
+
+              <span className="hidden md:flex">SignUp</span>
+            </Button>
+            
+)}
+
+
+
+         
         </div>
-      
-      
+
+
       </div>
     </header>
   );
