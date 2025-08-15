@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import React from 'react';
 
+
 import { usePathname } from 'next/navigation';
 import { Button } from './ui/button';
 import {
@@ -66,6 +67,7 @@ const Header = () => {
         }
 
         <div className='flex itmes-centre gap-3 ml-10 md:ml-20'>
+
           <SignedIn>
 
             <Link href="/dashboard">
@@ -87,7 +89,7 @@ const Header = () => {
           </SignedOut>
 
           <SignedIn>
- <UserButton
+            <UserButton
               appearance={{
                 elements: {
                   avatarBox: "w-10 h-10",
@@ -98,20 +100,20 @@ const Header = () => {
               afterSignOutUrl="/sign-in"
             />
 
-             </SignedIn>
-             
-             {!SignedIn&&(
-              <Link href={'/sign-in'}>
-            <Button className='gap-5 h-10 w-22 text-white font-medium transition-all duration-300 hover:text-cyan-400 cursor-pointer'>
+          </SignedIn>
 
-              <span className="hidden md:flex">SignUp</span>
-            </Button>
+          {!SignedIn && (
+            <Link href={'/sign-in'}>
+              <Button className='gap-5 h-10 w-22 text-white font-medium transition-all duration-300 hover:text-cyan-400 cursor-pointer'>
+
+                <span className="hidden md:flex">SignUp</span>
+              </Button>
             </Link>
-)}
+          )}
 
 
 
-         
+
         </div>
 
 

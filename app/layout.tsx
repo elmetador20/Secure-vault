@@ -1,5 +1,6 @@
-"use client"
+
 import type { Metadata } from "next";
+import { Toaster } from "react-hot-toast";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import {
@@ -32,21 +33,25 @@ export default function RootLayout({
 }>) {
   return (
     <>
-    
-     <ClerkProvider appearance={{
-      baseTheme:shadesOfPurple
-    }}>
-      <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          
-          <Navbar/>
-          <main>
-          {children}
-          </main>
-        </body>
-      </html>
-    </ClerkProvider>
-   
+
+      <ClerkProvider appearance={{
+        baseTheme: shadesOfPurple
+      }}>
+        <html lang="en">
+          <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+
+            <Navbar />
+            <Toaster
+              position="top-center"
+              reverseOrder={false}
+            />
+            <main>
+              {children}
+            </main>
+          </body>
+        </html>
+      </ClerkProvider>
+
     </>
   )
 }
