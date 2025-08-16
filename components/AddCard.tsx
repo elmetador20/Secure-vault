@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,6 +10,7 @@ import { CreditCard, Plus, Sparkles } from "lucide-react"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
+import toast from "react-hot-toast"
 
 import {
   Form,
@@ -41,6 +41,8 @@ const formSchema = z.object({
 })
 
 export default function AddCard() {
+  const [isLoading, setIsLoading] = useState(false)
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -52,10 +54,42 @@ export default function AddCard() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("Adding card:", values)
-    // Reset form after successful submission
-    form.reset()
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true)
+    
+    try {
+      const response = await fetch('/api/cards', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cardName: values.cardName,
+          cardHolder: values.cardholderName, // Note: API expects 'cardHolder'
+          cardNumber: values.cardNumber,
+          expiryDate: values.expiryDate,
+          cvv: values.cvv,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to save card')
+      }
+
+      const result = await response.json()
+      console.log("Card saved successfully:", result)
+      
+      // Show success message
+      toast.success('Card added successfully!')
+      
+      // Reset form after successful submission
+      form.reset()
+    } catch (error) {
+      console.error("Error saving card:", error)
+      toast.error('Failed to save card. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -178,10 +212,11 @@ export default function AddCard() {
 
             <Button
               type="submit"
-              className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-xl font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-[1.02]"
+              disabled={isLoading}
+              className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-xl font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Plus className="w-5 h-5 mr-2" />
-              Add Card
+              {isLoading ? "Adding Card..." : "Add Card"}
             </Button>
           </form>
         </Form>
