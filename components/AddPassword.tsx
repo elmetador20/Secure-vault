@@ -1,13 +1,13 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Lock, Plus, Eye, EyeOff, RefreshCw, Shield, Zap } from "lucide-react"
+import toast from "react-hot-toast"
 
 export default function AddPassword() {
   const [passwordData, setPasswordData] = useState({
@@ -17,6 +17,7 @@ export default function AddPassword() {
     url: "",
   })
   const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const generatePassword = () => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*"
@@ -27,16 +28,53 @@ export default function AddPassword() {
     setPasswordData({ ...passwordData, password })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Adding password:", passwordData)
-    // Reset form
-    setPasswordData({
-      siteName: "",
-      username: "",
-      password: "",
-      url: "",
-    })
+    
+    if (!passwordData.siteName || !passwordData.username || !passwordData.password) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+    
+    setIsLoading(true)
+    
+    try {
+      const response = await fetch('/api/passwords', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          siteName: passwordData.siteName,
+          url: passwordData.url || null, // API expects url to be nullable
+          username: passwordData.username,
+          password: passwordData.password,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to save password')
+      }
+
+      const result = await response.json()
+      console.log("Password saved successfully:", result)
+      
+      // Show success message
+      toast.success('Password added successfully!')
+      
+      // Reset form
+      setPasswordData({
+        siteName: "",
+        username: "",
+        password: "",
+        url: "",
+      })
+    } catch (error) {
+      console.error("Error saving password:", error)
+      toast.error('Failed to save password. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -54,11 +92,12 @@ export default function AddPassword() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-3">
             <Label htmlFor="siteName" className="text-white/90 font-medium">
-              Site Name
+              Site Name *
             </Label>
             <Input
               id="siteName"
               placeholder="Google"
+              required
               value={passwordData.siteName}
               onChange={(e) => setPasswordData({ ...passwordData, siteName: e.target.value })}
               className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-xl focus:border-blue-400/50 focus:ring-2 focus:ring-blue-400/20 transition-all duration-300"
@@ -67,7 +106,7 @@ export default function AddPassword() {
 
           <div className="space-y-3">
             <Label htmlFor="url" className="text-white/90 font-medium">
-              URL
+              URL (Optional)
             </Label>
             <Input
               id="url"
@@ -80,11 +119,12 @@ export default function AddPassword() {
 
           <div className="space-y-3">
             <Label htmlFor="username" className="text-white/90 font-medium">
-              Username/Email
+              Username/Email *
             </Label>
             <Input
               id="username"
               placeholder="john@example.com"
+              required
               value={passwordData.username}
               onChange={(e) => setPasswordData({ ...passwordData, username: e.target.value })}
               className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-xl focus:border-blue-400/50 focus:ring-2 focus:ring-blue-400/20 transition-all duration-300"
@@ -93,7 +133,7 @@ export default function AddPassword() {
 
           <div className="space-y-3">
             <Label htmlFor="password" className="text-white/90 font-medium">
-              Password
+              Password *
             </Label>
             <div className="flex gap-3">
               <div className="relative flex-1">
@@ -101,6 +141,7 @@ export default function AddPassword() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter password"
+                  required
                   value={passwordData.password}
                   onChange={(e) => setPasswordData({ ...passwordData, password: e.target.value })}
                   className="bg-white/5 border-white/10 text-white placeholder:text-white/40 h-12 rounded-xl pr-12 focus:border-blue-400/50 focus:ring-2 focus:ring-blue-400/20 transition-all duration-300"
@@ -130,10 +171,11 @@ export default function AddPassword() {
 
           <Button
             type="submit"
-            className="w-full h-12 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 rounded-xl font-semibold shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-[1.02]"
+            disabled={isLoading}
+            className="w-full h-12 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 rounded-xl font-semibold shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus className="w-5 h-5 mr-2" />
-            Add Password
+            {isLoading ? "Adding Password..." : "Add Password"}
           </Button>
         </form>
       </CardContent>
