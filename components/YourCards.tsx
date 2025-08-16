@@ -2,30 +2,45 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { CreditCard, Copy, Trash2, Eye, EyeOff } from "lucide-react"
-import { useState } from "react"
+import { CreditCard, Copy, Trash2, Eye, EyeOff, Loader2 } from "lucide-react"
+import { useState, useEffect } from "react"
+import toast from "react-hot-toast"
 
-const mockCards = [
-  {
-    id: 1,
-    name: "Main Card",
-    cardholderName: "John Doe",
-    cardNumber: "1234 5678 9012 3456",
-    expiryDate: "12/25",
-    cvv: "123",
-  },
-  {
-    id: 2,
-    name: "Business Card",
-    cardholderName: "John Doe",
-    cardNumber: "9876 5432 1098 7654",
-    expiryDate: "08/26",
-    cvv: "456",
-  },
-]
+interface CreditCardData {
+  id: number
+  cardName: string
+  cardHolder: string
+  cardNumber: string
+  expiryDate: string
+  cvv: string
+}
 
 export default function YourCards() {
+  const [cards, setCards] = useState<CreditCardData[]>([])
   const [visibleCards, setVisibleCards] = useState<Set<number>>(new Set())
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Fetch cards from database
+  useEffect(() => {
+    fetchCards()
+  }, [])
+
+  const fetchCards = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/cards')
+      if (!response.ok) {
+        throw new Error('Failed to fetch cards')
+      }
+      const data = await response.json()
+      setCards(data)
+    } catch (error) {
+      console.error('Error fetching cards:', error)
+      toast.error('Failed to load cards')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const toggleCardVisibility = (cardId: number) => {
     const newVisible = new Set(visibleCards)
@@ -39,15 +54,58 @@ export default function YourCards() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
+    toast.success('Copied to clipboard!')
+  }
+
+  const deleteCard = async (cardId: number) => {
+    if (!confirm('Are you sure you want to delete this card?')) {
+      return
+    }
+    
+    try {
+      const response = await fetch(`/api/cards/${cardId}`, {
+        method: 'DELETE'
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete card')
+      }
+      
+      // Remove card from local state
+      setCards(cards.filter(card => card.id !== cardId))
+      toast.success('Card deleted successfully!')
+    } catch (error) {
+      console.error('Error deleting card:', error)
+      toast.error('Failed to delete card')
+    }
   }
 
   const maskCardNumber = (cardNumber: string) => {
     return cardNumber.replace(/\d(?=\d{4})/g, "*")
   }
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-white/60" />
+        <span className="ml-2 text-white/60">Loading cards...</span>
+      </div>
+    )
+  }
+
+  if (cards.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <CreditCard className="w-16 h-16 mx-auto text-white/30 mb-4" />
+        <p className="text-white/60 text-lg">No credit cards added yet</p>
+        <p className="text-white/40 text-sm">Add your first card above to get started</p>
+      </div>
+    )
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {mockCards.map((card) => {
+      {cards.map((card) => {
         const isVisible = visibleCards.has(card.id)
         return (
           <Card key={card.id} className="bg-white/10 backdrop-blur-md border-white/20 text-white">
@@ -55,7 +113,7 @@ export default function YourCards() {
               <CardTitle className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <CreditCard className="w-5 h-5" />
-                  {card.name}
+                  {card.cardName}
                 </div>
                 <Button
                   variant="ghost"
@@ -70,7 +128,7 @@ export default function YourCards() {
             <CardContent className="space-y-3">
               <div>
                 <p className="text-sm text-white/70">Cardholder</p>
-                <p className="font-medium">{card.cardholderName}</p>
+                <p className="font-medium">{card.cardHolder}</p>
               </div>
 
               <div>
@@ -110,7 +168,12 @@ export default function YourCards() {
               </div>
 
               <div className="flex justify-end pt-2">
-                <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300 hover:bg-red-500/20">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => deleteCard(card.id)}
+                  className="text-red-400 hover:text-red-300 hover:bg-red-500/20"
+                >
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
