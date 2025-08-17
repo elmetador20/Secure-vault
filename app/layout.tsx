@@ -12,6 +12,7 @@ import {
   UserButton,
 } from '@clerk/nextjs'
 import { dark, shadesOfPurple } from '@clerk/themes'
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import Navbar from "@/components/navbar";
 
 const geistSans = Geist({
@@ -33,7 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <>
-
+ <SpeedInsights/>
       <ClerkProvider appearance={{
         baseTheme: shadesOfPurple
       }}>
