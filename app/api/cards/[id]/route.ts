@@ -4,9 +4,9 @@ import { prisma } from "@/lib/prisma";
 // DELETE /api/cards/[id]
 export async function DELETE(
   req: Request,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = context.params;
+  const { id } = await context.params;
 
   try {
     const parsedId = parseInt(id);
@@ -39,9 +39,9 @@ export async function DELETE(
 // GET /api/cards/[id]
 export async function GET(
   req: Request,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = context.params;
+  const { id } = await context.params;
 
   try {
     const parsedId = parseInt(id);

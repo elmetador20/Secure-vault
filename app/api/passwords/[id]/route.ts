@@ -4,11 +4,12 @@ import { prisma } from "@/lib/prisma";
 // DELETE /api/passwords/[id]
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id);
-    
+    const { id: idParam } = await params;
+    const id = parseInt(idParam);
+        
     if (isNaN(id)) {
       return NextResponse.json({ error: "Invalid password ID" }, { status: 400 });
     }
@@ -37,11 +38,12 @@ export async function DELETE(
 // GET /api/passwords/[id] - Optional: Get a specific password
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id);
-    
+    const { id: idParam } = await params;
+    const id = parseInt(idParam);
+        
     if (isNaN(id)) {
       return NextResponse.json({ error: "Invalid password ID" }, { status: 400 });
     }
