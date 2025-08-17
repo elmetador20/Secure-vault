@@ -34,7 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <>
- <SpeedInsights/>
+
       <ClerkProvider appearance={{
         baseTheme: shadesOfPurple
       }}>
@@ -48,6 +48,7 @@ export default function RootLayout({
             />
             <main>
               {children}
+               <SpeedInsights/>
             </main>
           </body>
         </html>
