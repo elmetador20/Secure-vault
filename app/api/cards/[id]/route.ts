@@ -4,18 +4,20 @@ import { prisma } from "@/lib/prisma";
 // DELETE /api/cards/[id]
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
+  const { id } = context.params;
+
   try {
-    const id = parseInt(params.id);
-    
-    if (isNaN(id)) {
+    const parsedId = parseInt(id);
+
+    if (isNaN(parsedId)) {
       return NextResponse.json({ error: "Invalid card ID" }, { status: 400 });
     }
 
     // Check if card exists
     const existingCard = await prisma.creditCard.findUnique({
-      where: { id },
+      where: { id: parsedId },
     });
 
     if (!existingCard) {
@@ -24,7 +26,7 @@ export async function DELETE(
 
     // Delete the card
     await prisma.creditCard.delete({
-      where: { id },
+      where: { id: parsedId },
     });
 
     return NextResponse.json({ success: true, message: "Card deleted successfully" });
@@ -34,20 +36,22 @@ export async function DELETE(
   }
 }
 
-// GET /api/cards/[id] - Optional: Get a specific card
+// GET /api/cards/[id]
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
+  const { id } = context.params;
+
   try {
-    const id = parseInt(params.id);
-    
-    if (isNaN(id)) {
+    const parsedId = parseInt(id);
+
+    if (isNaN(parsedId)) {
       return NextResponse.json({ error: "Invalid card ID" }, { status: 400 });
     }
 
     const card = await prisma.creditCard.findUnique({
-      where: { id },
+      where: { id: parsedId },
     });
 
     if (!card) {
