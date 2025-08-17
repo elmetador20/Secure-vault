@@ -15,7 +15,6 @@ import {
 } from '@clerk/nextjs'
 
 
-import { LayoutDashboard } from 'lucide-react';
 const Header = () => {
   const path = usePathname();
 
@@ -23,6 +22,7 @@ const Header = () => {
   if (path.includes("/editor")) {
     return null;
   }
+  
 
 
   return (
@@ -69,11 +69,18 @@ const Header = () => {
         <div className='flex itmes-centre gap-3 ml-10 md:ml-20'>
 
           <SignedIn>
+             <Link
+              href="/"
+            >
+              <Button className='gap-5 h-10 w-22 text-white font-medium transition-all duration-300 hover:text-cyan-400 cursor-pointer' >
+           Home
+              </Button>
+            </Link>
 
-            <Link href="/dashboard">
+            <Link href="/Hero">
               <Button className='gap-5 h-10 w-22 text-white font-medium transition-all duration-300 hover:text-cyan-400 cursor-pointer' >
 
-                <span className="hidden md:flex">Dashboard</span>
+                <span className="hidden md:flex">Your Vault</span>
               </Button>
             </Link>
           </SignedIn>
@@ -100,16 +107,18 @@ const Header = () => {
               afterSignOutUrl="/sign-in"
             />
 
-          </SignedIn>
-
           {!SignedIn && (
-            <Link href={'/sign-in'}>
+            <SignUpButton>
+          
               <Button className='gap-5 h-10 w-22 text-white font-medium transition-all duration-300 hover:text-cyan-400 cursor-pointer'>
 
                 <span className="hidden md:flex">SignUp</span>
               </Button>
-            </Link>
+    
+            </SignUpButton>
           )}
+
+          </SignedIn>
 
 
 
